@@ -1,0 +1,57 @@
+{% extends './layout2.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+
+<main class="flex flex-col h-screen bg-color1">
+    
+<div class="flex-1 overflow-y-scroll">
+   
+    <div id="conversation" class="chat-boxflex flex-col bg-color1" contenteditable="false"></div>
+</div>
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    
+    <div class="bg-color1 px-4 py-2">
+
+        <div class="flex items-center">
+            <input type="text" class="w-full border border-white  text-white rounded-full py-2 px-4 mr-2" name="user_input" id="user_input" placeholder="type your message" required>
+        <button class="bg-color4 text-black hover:bg-color3 hover:text-white font-medium py-2 px-4 rounded-full">Send</button>
+        </div>
+    </div>
+</form>
+</main>
+<script>
+    const conversation = `{{conversation}}`;
+    const conversationFormat = conversation.split("\n").map((line) => {
+       const trimmedLine = line.trim();
+        if (!trimmedLine) {
+            return null;
+        }
+
+        if ( trimmedLine.startsWith("User:"))  {
+            return `<div class="flex-1   chat-entry">
+                <div class="px-4 py-2">
+                    <div class="flex item-center mb-2">
+                    <img class="w-8 h-8 rounded-full mr-2" src="https://picsum.photos/50/50" alt="User Avatar">  
+                <div class="bg-color4 text-colr1 font-medium mr-2 p-2  shadow rounded-lg mex-w-sm">
+                    <strong >${line.split(":")[0]}</strong>${line.split(":").slice(1).join(":")} </div>
+                    </div>
+            `;
+        } else  if  ( !line.startsWith("User:")) {
+            return `<div class="flex items-center justify-end chat-entry">
+                <div class="bg-color3 text-color1 font-medium mr-2 p-2  shadow rounded-lg max-w-md">
+                    <strong >${line.split(":")[0]}</strong>${line.split(":").slice(1).join(":")} </div>
+                    <img class="w-8 h-8 rounded-full" src="{{url_for('static', filename='img/Logo-08.png')}}" alt="Bot Avatar">
+                    </div>
+            `;
+        }  
+    })
+    .filter((line) => line !== null)
+    .join("");
+    document.getElementById("conversation").innerHTML = conversationFormat;
+</script>
+
+
+{% endblock  %}
